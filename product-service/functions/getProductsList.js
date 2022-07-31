@@ -1,7 +1,7 @@
 import { Client } from 'pg';
 import { dbConfig  } from "../client";
 
-module.exports.getProductsList = async () => {
+const getProductsList = async () => {
     const query = `
         select id, title, description, price, products_count
             from products
@@ -30,3 +30,5 @@ module.exports.getProductsList = async () => {
     client.end();
   }
 };
+
+export default getProductsList

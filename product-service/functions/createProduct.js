@@ -1,7 +1,7 @@
 import { Client } from 'pg';
 import { dbConfig } from "../client";
 
-module.exports.createProduct = async (event) => {
+const createProduct = async (event) => {
     const { body } = event;
     console.log(body, 'createProduct')
 
@@ -72,3 +72,5 @@ module.exports.createProduct = async (event) => {
         }
     }
 };
+
+export default createProduct;

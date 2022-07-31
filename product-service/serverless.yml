@@ -34,21 +34,21 @@ package:
 
 functions:
   getProductsList:
-    handler: functions/getProductsList.getProductsList
+    handler: functions/getProductsList.default
     events:
       - http:
           path: /products
           method: get
           cors: true
   getProductsById:
-    handler: functions/getProductsById.getProductsById
+    handler: functions/getProductsById.default
     events:
       - http:
           path: /products/{productId}
           method: get
           cors: true
   createProduct:
-    handler: functions/createProduct.createProduct
+    handler: functions/createProduct.default
     events:
       - http:
           path: /products

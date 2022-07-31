@@ -1,7 +1,7 @@
 import { Client } from 'pg';
 import { dbConfig } from "../client";
 
-module.exports.getProductsById = async (event) => {
+const getProductsById = async (event) => {
     const { productId } = event.pathParameters;
     const query = `
         select id, title, description, price, products_count from products 
@@ -37,3 +37,5 @@ module.exports.getProductsById = async (event) => {
         client.end();
     }
 };
+
+export default getProductsById
