@@ -21,6 +21,7 @@
     "webpack": "^4.35.2"
   },
   "dependencies": {
+    "aws-sdk": "^2.1188.0",
     "axios": "^0.27.2",
     "babel-jest": "^28.1.2",
     "pg": "^8.7.3",
