@@ -18,6 +18,20 @@ provider:
     PG_USERNAME: ${env:PG_USERNAME}
     PG_PASSWORD: ${env:PG_PASSWORD}
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    SNS_ARN:
+      Ref: SNSTopic
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - "sqs:*"
+          Resource: !GetAtt SQSQueue.Arn
+        - Effect: Allow
+          Action:
+            - 'sns:*'
+          Resource:
+            Ref: SNSTopic
 plugins:
   - serverless-webpack
   - serverless-dotenv-plugin
@@ -54,13 +68,57 @@ functions:
           path: /products
           method: post
           cors: true
+  catalogBatchProcess:
+    handler: functions/catalogBatchProcess.default
+    events:
+      - sqs:
+          batchSize: 5
+          arn: !GetAtt SQSQueue.Arn
 
-# functions:
-
-#   # getProductsList: 
-#   # path: /products
-#   # getProductsById 
-#   # path /products/{productId}
-#   # createProduct 
-#   # path: /products  (POST)
-  
+resources:
+  Resources:
+    SQSQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: catalogItemsQueue
+    SNSTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: createProductTopic
+    SNSSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: ${env:SNS_EMAIL}
+        Protocol: email
+        TopicArn:
+          Ref: SNSTopic
+    SNSCustomSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: ${env:SNS_EMAIL_2}
+        Protocol: email
+        TopicArn:
+          Ref: SNSTopic
+        FilterPolicy:
+          expensive:
+            - 'true'
+  Outputs:
+    SQSUrl:
+      Value:
+        Ref: SQSQueue
+      Export:
+        Name: SQSUrl
+    SQSQueueArn:
+      Value: !GetAtt SQSQueue.Arn
+      Export:
+        Name: SQSQueueArn
+    SNSTopic:
+      Value:
+        Ref: SNSTopic
+      Export:
+        Name: SNSTopic
+    SNSSubscription:
+      Value:
+        Ref: SNSSubscription
+      Export:
+        Name: SNSSubscription
