@@ -1,0 +1,52 @@
+service: import-service
+frameworkVersion: '3'
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: eu-west-1
+  httpApi:
+    cors: true
+  environment:
+    BUCKET: ${self:custom.bucket}
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action: "s3:ListBucket"
+          Resource:
+            - arn:aws:s3:::${self:custom.bucket}
+        - Effect: "Allow"
+          Action:
+            - "s3:*"
+          Resource:
+            - arn:aws:s3:::${self:custom.bucket}/*
+plugins:
+  - serverless-webpack
+
+custom:
+  bucket: rs-import-file-bucket
+  webpack:
+    webpackConfig: 'webpack.config.js'
+    includeModules: true
+    packager: 'npm'
+    excludeFiles: /**/*.test.js
+
+package:
+  individually: true
+
+functions:
+  importProductsFile:
+    handler: functions/importProductsFile.default
+    events:
+      - http:
+          path: /import
+          method: get
+          cors: true
+          request:
+            parameters:
+              querystrings:
+                name: true
